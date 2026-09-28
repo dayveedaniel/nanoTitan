@@ -58,7 +58,7 @@ def time_ms(nanotitan_cuda, implementation, a, b, warmup, iters):
 
     return start.elapsed_time(end) / iters
 
-
+# RTX 3090
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -67,9 +67,9 @@ def main():
         default="all",
     )
     parser.add_argument("--device", type=int, default=0)
-    parser.add_argument("--m", type=int, default=1024)
-    parser.add_argument("--n", type=int, default=1024)
-    parser.add_argument("--k", type=int, default=1024)
+    parser.add_argument("--m", type=int, default=8192)
+    parser.add_argument("--n", type=int, default=8192)
+    parser.add_argument("--k", type=int, default=12288)
     parser.add_argument("--dtype", choices=["fp32", "fp16", "bf16"], default="fp16")
     parser.add_argument("--warmup", type=int, default=20)
     parser.add_argument("--iters", type=int, default=100)
