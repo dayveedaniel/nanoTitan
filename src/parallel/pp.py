@@ -13,6 +13,7 @@ from src.metrics import HistogramMetric, ScalarMetric
 from src.model.model import NanoTitanModel
 from src.model.utils import max_violation
 from src.parallel.pp_schedules import get_pipeline_schedule
+from src.parallel.pp_schedules.comms import PipelineComms
 from src.parallel_dims import ParallelDims
 from src.utils import clip_gradients, compute_grad_norm
 
@@ -35,6 +36,7 @@ class PipelineParallel:
         self.reducers = reducers
         self.run_schedule = get_pipeline_schedule(cfg.runtime.pipeline_schedule)
         self.microbatch_states = {}
+        self.comms = PipelineComms(dim.prev_pp_rank, dim.pp_group, dim.next_pp_rank)
 
     def synchronize_device(self):
         if torch.cuda.is_available():
@@ -207,26 +209,6 @@ class PipelineParallel:
             dtype=self.cfg.model.dtype,
             device=self.device,
         )
-
-    def recv_forward(self, microbatch_id):
-        stage_input = self._activation_buffer()
-        logger.debug("Receiving forward microbatch %s", microbatch_id)
-        dist.recv(stage_input, src=self.dim.prev_pp_rank, group=self.dim.pp_group)
-        return stage_input
-
-    def send_forward(self, microbatch_id, stage_output):
-        logger.debug("Sending forward microbatch %s", microbatch_id)
-        dist.send(stage_output, dst=self.dim.next_pp_rank, group=self.dim.pp_group)
-
-    def recv_backward(self, microbatch_id):
-        output_grad = self._activation_buffer()
-        logger.debug("Receiving backward microbatch %s", microbatch_id)
-        dist.recv(output_grad, src=self.dim.next_pp_rank, group=self.dim.pp_group)
-        return output_grad
-
-    def send_backward(self, microbatch_id, input_grad):
-        logger.debug("Sending backward microbatch %s", microbatch_id)
-        dist.send(input_grad, dst=self.dim.prev_pp_rank, group=self.dim.pp_group)
 
     def send_forward_recv_backward(self, stage_output):
         output_grad = self._activation_buffer()
