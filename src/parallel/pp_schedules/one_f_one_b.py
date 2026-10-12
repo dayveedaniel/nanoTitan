@@ -10,16 +10,16 @@ def run_1F1B(pipeline, model, microbatch_x, microbatch_y):
 
     with record_function("1f1b/warmup"):
         while fwd_idx < warmup_steps:
-            stage_input = (
-                microbatch_x[fwd_idx].to(pipeline.device)
-                if pipeline.dim.is_pp_first_stage
-                else pipeline.recv_forward(fwd_idx)
-            )
+            if pipeline.dim.is_pp_first_stage:
+                stage_input = microbatch_x[fwd_idx].to(pipeline.device)
+            else:
+                fwd_buffer = pipeline._activation_buffer()
+                stage_input = pipeline.comms.recv_forward(fwd_idx, fwd_buffer)
             stage_output = pipeline.forward_microbatch(
                 fwd_idx, model, stage_input, microbatch_y[fwd_idx]
             )
             if not pipeline.dim.is_pp_last_stage and fwd_idx < warmup_steps - 1:
-                pipeline.send_forward(fwd_idx, stage_output)
+                pipeline.comms.send_forward(fwd_idx, stage_output)
             fwd_idx += 1
 
     if fwd_idx == num_microbatches:
@@ -27,11 +27,15 @@ def run_1F1B(pipeline, model, microbatch_x, microbatch_y):
 
     with record_function("1f1b/steady"):
         while True:
-            output_grad = (
-                None
-                if pipeline.dim.is_pp_last_stage
-                else pipeline.send_forward_recv_backward(stage_output)
-            )
+            # send fwd and recv bwd is skipped for the last stage
+            if pipeline.dim.is_pp_last_stage:
+                output_grad = None
+            else:
+                output_grad_buffer = pipeline._activation_buffer()
+                output_grad = pipeline.comms.send_forward_recv_backward(
+                    stage_output, output_grad_buffer
+                )
+
             input_grad = pipeline.backward_microbatch(
                 bwd_idx,
                 output_grad,
@@ -41,13 +45,17 @@ def run_1F1B(pipeline, model, microbatch_x, microbatch_y):
 
             if fwd_idx == num_microbatches:
                 if not pipeline.dim.is_pp_first_stage:
-                    pipeline.send_backward(bwd_idx - 1, input_grad)
+                    pipeline.comms.send_backward(bwd_idx - 1, input_grad)
                 break
-            stage_input = (
-                microbatch_x[fwd_idx].to(pipeline.device)
-                if pipeline.dim.is_pp_first_stage
-                else pipeline.recv_forward_send_backward(input_grad)
-            )
+
+            if pipeline.dim.is_pp_first_stage:
+                stage_input = microbatch_x[fwd_idx].to(pipeline.device)
+            else:
+                stage_input_buffer = pipeline._activation_buffer()
+                stage_input = pipeline.comms.recv_forward_send_backward(
+                    input_grad, stage_input_buffer
+                )
+
             stage_output = pipeline.forward_microbatch(
                 fwd_idx, model, stage_input, microbatch_y[fwd_idx]
             )
@@ -57,12 +65,17 @@ def run_1F1B(pipeline, model, microbatch_x, microbatch_y):
 
     with record_function("1f1b/cooldown"):
         while bwd_idx < num_microbatches:
-            output_grad = None if pipeline.dim.is_pp_last_stage else pipeline.recv_backward(bwd_idx)
+            if pipeline.dim.is_pp_last_stage:
+                output_grad = None
+            else:
+                bwd_buffer = pipeline._activation_buffer()
+                output_grad = pipeline.comms.recv_backward(bwd_idx, bwd_buffer)
+
             input_grad = pipeline.backward_microbatch(
                 bwd_idx,
                 output_grad,
                 sync_gradients=bwd_idx == num_microbatches - 1,
             )
             if not pipeline.dim.is_pp_first_stage:
-                pipeline.send_backward(bwd_idx, input_grad)
+                pipeline.comms.send_backward(bwd_idx, input_grad)
             bwd_idx += 1

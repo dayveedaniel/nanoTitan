@@ -35,3 +35,24 @@ class PipelineComms:
     def send_backward(self, microbatch_id: int, input_grad: torch.Tensor):
         logger.debug("Sending backward microbatch %s", microbatch_id)
         dist.send(input_grad, dst=self.prev_pp_rank, group=self.pp_group)
+
+    def _send_recv(
+        self, outgoing_tensor: torch.Tensor, incoming_tensor: torch.Tensor, dest_rank: int
+    ) -> torch.Tensor:
+        ops = [
+            dist.P2POp(dist.isend, outgoing_tensor, dest_rank, self.dim.pp_group),
+            dist.P2POp(dist.irecv, incoming_tensor, dest_rank, self.dim.pp_group),
+        ]
+        for work in dist.batch_isend_irecv(ops):
+            work.wait()
+        return incoming_tensor
+
+    def send_forward_recv_backward(
+        self, stage_output: torch.Tensor, output_grad_buffer: torch.Tensor
+    ):
+        return self._send_recv(stage_output, output_grad_buffer, self.next_pp_rank)
+
+    def recv_forward_send_backward(
+        self, input_grad: torch.Tensor, stage_input_buffer: torch.Tensor
+    ):
+        return self._send_recv(input_grad, stage_input_buffer, self.prev_pp_rank)
