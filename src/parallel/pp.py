@@ -210,26 +210,6 @@ class PipelineParallel:
             device=self.device,
         )
 
-    def send_forward_recv_backward(self, stage_output):
-        output_grad = self._activation_buffer()
-        ops = [
-            dist.P2POp(dist.isend, stage_output, self.dim.next_pp_rank, self.dim.pp_group),
-            dist.P2POp(dist.irecv, output_grad, self.dim.next_pp_rank, self.dim.pp_group),
-        ]
-        for work in dist.batch_isend_irecv(ops):
-            work.wait()
-        return output_grad
-
-    def recv_forward_send_backward(self, input_grad):
-        stage_input = self._activation_buffer()
-        ops = [
-            dist.P2POp(dist.isend, input_grad, self.dim.prev_pp_rank, self.dim.pp_group),
-            dist.P2POp(dist.irecv, stage_input, self.dim.prev_pp_rank, self.dim.pp_group),
-        ]
-        for work in dist.batch_isend_irecv(ops):
-            work.wait()
-        return stage_input
-
     def _moe_metrics(
         self, model: NanoTitanModel, moe_route_counts
     ) -> dict[str, ScalarMetric | HistogramMetric]:
@@ -272,5 +252,7 @@ class PipelineParallel:
         assert batch_size % num_microbatches == 0
         microbatch_x = x.chunk(chunks=num_microbatches)
         microbatch_y = y.chunk(chunks=num_microbatches)
+
+        assert len(microbatch_x) == len(microbatch_y)
 
         return microbatch_x, microbatch_y
