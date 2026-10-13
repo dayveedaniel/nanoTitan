@@ -130,15 +130,17 @@ Run all single-process tests, including CPU-compatible and CUDA tests:
 uv run --no-sync pytest -m "not distributed"
 ```
 
-### Distributed torch EP test
+### Distributed tests
 
-Launch the unsharded-versus-sharded torch EP correctness test with two ranks:
+Run all distributed tests on the same two GPUs:
 
 ```bash
-uv run --no-sync torchrun --standalone --nproc-per-node=2 --module pytest -q tests/distributed/test_torch_ep_a2a.py
+uv run --no-sync torchrun --standalone --nproc-per-node=2 --module pytest -q tests/distributed/
 ```
 
-The test uses NCCL when CUDA is available and otherwise falls back to Gloo.
+All current distributed tests require exactly two ranks and run sequentially in this launch, reusing the same two GPUs. This includes DP training-step and PP forward/backward equivalence in FP32, FP16, and BF16, plus the FP32 torch EP correctness test.
+
+The tests use NCCL when CUDA and NCCL are available, and otherwise fall back to Gloo on CPU. BF16 cases are skipped if either GPU lacks BF16 support.
 
 ### Complete test suite
 
@@ -146,7 +148,7 @@ On a machine with the CUDA extension built and two available ranks, run:
 
 ```bash
 uv run --no-sync pytest -m "not distributed"
-uv run --no-sync torchrun --standalone --nproc-per-node=2 --module pytest -q tests/distributed/test_torch_ep_a2a.py
+uv run --no-sync torchrun --standalone --nproc-per-node=2 --module pytest -q tests/distributed/
 ```
 
 ---
