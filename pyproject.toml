@@ -35,11 +35,17 @@ cu128 = [
     "torch==2.7.1",
 ]
 
+rocm = [
+    "torch==2.13.0",
+    "triton-rocm==3.7.1; sys_platform == 'linux'",
+]
+
 [tool.uv]
 conflicts = [
     [
         { extra = "cpu" },
         { extra = "cu128" },
+        { extra = "rocm" },
     ],
 ]
 no-build-isolation-package = ["nanotitan"]
@@ -48,7 +54,9 @@ no-build-isolation-package = ["nanotitan"]
 torch = [
     { index = "pytorch-cpu", extra = "cpu" },
     { index = "pytorch-cu128", extra = "cu128" },
+    { index = "pytorch-rocm", extra = "rocm" },
 ]
+triton-rocm = { index = "pytorch-rocm", extra = "rocm" }
 
 
 [[tool.uv.index]]
@@ -59,6 +67,11 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-rocm"
+url = "https://download.pytorch.org/whl/rocm7.2"
 explicit = true
 
 [tool.ruff]

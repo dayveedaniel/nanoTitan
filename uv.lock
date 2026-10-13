@@ -2,20 +2,24 @@ version = 1
 revision = 3
 requires-python = "==3.11.*"
 resolution-markers = [
-    "sys_platform == 'win32' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'emscripten' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128'",
-    "sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'win32' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'emscripten' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'darwin' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform == 'emscripten' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
-    "sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128'",
+    "sys_platform == 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'emscripten' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm'",
+    "sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'win32' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'emscripten' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'win32' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'emscripten' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform != 'darwin' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'darwin' and extra == 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform == 'emscripten' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
+    "sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-9-nanotitan-cpu' and extra != 'extra-9-nanotitan-cu128' and extra != 'extra-9-nanotitan-rocm'",
 ]
 conflicts = [[
     { package = "nanotitan", extra = "cpu" },
     { package = "nanotitan", extra = "cu128" },
+    { package = "nanotitan", extra = "rocm" },
 ]]
 
 [[package]]
@@ -148,7 +152,7 @@ name = "click"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
 wheels = [
@@ -399,7 +403,7 @@ dependencies = [
     { name = "click" },
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
     { name = "httpx" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -618,11 +622,15 @@ dependencies = [
 
 [package.optional-dependencies]
 cpu = [
-    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-9-nanotitan-cpu') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
-    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-9-nanotitan-cpu') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "torch", version = "2.7.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform == 'darwin' and extra == 'extra-9-nanotitan-cpu') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
+    { name = "torch", version = "2.7.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "(sys_platform != 'darwin' and extra == 'extra-9-nanotitan-cpu') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
 ]
 cu128 = [
     { name = "torch", version = "2.7.1+cu128", source = { registry = "https://download.pytorch.org/whl/cu128" } },
+]
+rocm = [
+    { name = "torch", version = "2.13.0+rocm7.2", source = { registry = "https://download.pytorch.org/whl/rocm7.2" } },
+    { name = "triton-rocm", marker = "sys_platform == 'linux'" },
 ]
 
 [package.dev-dependencies]
@@ -648,8 +656,10 @@ requires-dist = [
     { name = "tiktoken", specifier = ">=0.12.0" },
     { name = "torch", marker = "extra == 'cpu'", specifier = "==2.7.1", index = "https://download.pytorch.org/whl/cpu", conflict = { package = "nanotitan", extra = "cpu" } },
     { name = "torch", marker = "extra == 'cu128'", specifier = "==2.7.1", index = "https://download.pytorch.org/whl/cu128", conflict = { package = "nanotitan", extra = "cu128" } },
+    { name = "torch", marker = "extra == 'rocm'", specifier = "==2.13.0", index = "https://download.pytorch.org/whl/rocm7.2", conflict = { package = "nanotitan", extra = "rocm" } },
+    { name = "triton-rocm", marker = "sys_platform == 'linux' and extra == 'rocm'", specifier = "==3.7.1", index = "https://download.pytorch.org/whl/rocm7.2", conflict = { package = "nanotitan", extra = "rocm" } },
 ]
-provides-extras = ["cpu", "cu128"]
+provides-extras = ["cpu", "cu128", "rocm"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -887,10 +897,10 @@ name = "nvitop"
 version = "1.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
     { name = "nvidia-ml-py" },
     { name = "psutil" },
-    { name = "windows-curses", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "windows-curses", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ee/86/81c262e9c4adee00dd4eb968c8a7c4b2395a9f466299b87f5f422e503609/nvitop-1.7.1.tar.gz", hash = "sha256:3803112a1d4a7e01989ae5bf5a5e42f0366bf791d68ad8e3b1859d7ed747140c", size = 222479, upload-time = "2026-07-10T11:26:33.894Z" }
 wheels = [
@@ -913,7 +923,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "numpy" },
     { name = "python-dateutil" },
-    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "tzdata", marker = "sys_platform == 'emscripten' or sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f8/87/4341c6252d1c47b08768c3d25ac487362bf403f0313ddae4a2a26c9b1b4c/pandas-3.0.3.tar.gz", hash = "sha256:696a4a00a2a2a35d4e5deb3fc946641b96c944f02230e4f76137fe35d806c4fc", size = 4651414, upload-time = "2026-05-11T18:54:29.21Z" }
 wheels = [
@@ -1134,7 +1144,7 @@ name = "pytest"
 version = "9.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -1253,11 +1263,11 @@ wheels = [
 
 [[package]]
 name = "setuptools"
-version = "70.2.0"
+version = "84.0.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/8d/e6/2fc95aec377988ff3ca882aa58d4f6ab35ff59a12b1611a9fe3075eb3019/setuptools-70.2.0.tar.gz", hash = "sha256:bd63e505105011b25c3c11f753f7e3b8465ea739efddaccef8f0efac2137bac1", size = 2332711, upload-time = "2024-07-01T16:32:41.666Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6d/44/f5da03a8ef95d369145c5bb53050e7877c9f3d312e128605fd9504829143/setuptools-84.0.0.tar.gz", hash = "sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73", size = 1168449, upload-time = "2026-08-08T18:27:58.365Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/42/54/2a8ecfcc9a714a6fbf86559a4b0f50b126a4ac4269ea8134f2c75c3e73de/setuptools-70.2.0-py3-none-any.whl", hash = "sha256:b8b8060bb426838fbe942479c90296ce976249451118ef566a5a0b7d8b78fb05", size = 930834, upload-time = "2024-07-01T16:32:34.354Z" },
+    { url = "https://files.pythonhosted.org/packages/95/9c/c510029fc6ef33a6275cd2c5d3cecd6613dfd6aa401d57c54f1c18852ccf/setuptools-84.0.0-py3-none-any.whl", hash = "sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670", size = 818216, upload-time = "2026-08-08T18:27:56.719Z" },
 ]
 
 [[package]]
@@ -1411,11 +1421,34 @@ wheels = [
 ]
 
 [[package]]
+name = "torch"
+version = "2.13.0+rocm7.2"
+source = { registry = "https://download.pytorch.org/whl/rocm7.2" }
+resolution-markers = [
+    "sys_platform == 'win32'",
+    "sys_platform == 'emscripten'",
+    "sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+dependencies = [
+    { name = "filelock" },
+    { name = "fsspec" },
+    { name = "jinja2" },
+    { name = "networkx" },
+    { name = "setuptools" },
+    { name = "sympy" },
+    { name = "triton-rocm", marker = "sys_platform == 'linux'" },
+    { name = "typing-extensions" },
+]
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/rocm7.2/torch-2.13.0%2Brocm7.2-cp311-cp311-manylinux_2_28_x86_64.whl", upload-time = "2026-07-08T11:24:25Z" },
+]
+
+[[package]]
 name = "tqdm"
 version = "4.68.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128')" },
+    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-cu128') or (extra == 'extra-9-nanotitan-cpu' and extra == 'extra-9-nanotitan-rocm') or (extra == 'extra-9-nanotitan-cu128' and extra == 'extra-9-nanotitan-rocm')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ae/5f/57ff8b434839e70dab45601284ea413e947a63799891b7553e5960a793a8/tqdm-4.68.4.tar.gz", hash = "sha256:19829c9673638f2a0b8617da4cdcb927e831cd88bcfcb6e78d42a4d1af131520", size = 792418, upload-time = "2026-07-07T09:58:18.369Z" }
 wheels = [
@@ -1431,6 +1464,14 @@ dependencies = [
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/21/2f/3e56ea7b58f80ff68899b1dbe810ff257c9d177d288c6b0f55bf2fe4eb50/triton-3.3.1-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b31e3aa26f8cb3cc5bf4e187bf737cbacf17311e1112b781d4a059353dfd731b", size = 155689937, upload-time = "2025-05-29T23:39:44.182Z" },
+]
+
+[[package]]
+name = "triton-rocm"
+version = "3.7.1"
+source = { registry = "https://download.pytorch.org/whl/rocm7.2" }
+wheels = [
+    { url = "https://download-r2.pytorch.org/whl/triton_rocm-3.7.1-cp311-cp311-linux_x86_64.whl", hash = "sha256:bdbebb676e09dd50cdb3acba46c702de434baadd1b9eaca5ace9f9a038b9e37b", upload-time = "2026-06-17T17:04:53Z" },
 ]
 
 [[package]]
