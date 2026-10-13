@@ -141,8 +141,13 @@ def test_two_rank_torch_ep_matches_unsharded_reference():
         local_end = local_start + LOCAL_BATCH_SIZE
         sharded_input = reference_input.detach()[local_start:local_end].clone().requires_grad_(True)
 
-        reference_output, reference_counts = reference(reference_input)
-        sharded_output, local_counts = sharded(sharded_input)
+        reference_output, reference_stats = reference(reference_input)
+        sharded_output, local_stats = sharded(sharded_input)
+
+        # These balanced inputs avoid capacity rerouting, so the raw routing
+        # counts in the stats also describe the dispatched expert assignments.
+        reference_counts = reference_stats.tokens_per_expert
+        local_counts = local_stats.tokens_per_expert
 
         output_gradient = torch.linspace(
             -1.0,
