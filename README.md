@@ -66,6 +66,14 @@ Install CUDA Toolkit, CUDA environment and build the CUDA extension
 uv sync --python 3.11 --locked --extra cu128
 ```
 
+With the ROCm toolkit installed and `hipcc` on `PATH`, install the ROCm environment and build the extension:
+
+```bash
+uv sync --python 3.11 --locked --extra rocm --dev
+```
+
+PyTorch automatically translates the existing CUDA sources to HIP. For MI355X, set `PYTORCH_ROCM_ARCH=gfx950` before building.
+
 ### Cache dataset locally from the streaming dataset:
 
 ```bash
