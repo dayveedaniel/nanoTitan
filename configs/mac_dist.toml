@@ -1,0 +1,54 @@
+run_name = "mac_rms_norm"
+max_steps = 200
+numerical_eps = 1e-8
+
+[model]
+vocab_size = 50257
+d_model = 128
+max_seq_len = 512
+n_layers = 8
+d_head = 16
+n_heads = 8
+ffn_in = 512
+num_experts = 1
+top_k = 1
+capacity_factor = 1.25
+router_alpha = 0.01
+moe_backend = "torch"
+dtype = "float32"
+norm_type = "rmsnorm"
+
+[trainer]
+seed = 42
+val_interval = -1
+num_val_batches = 10
+per_device_batch_size = 2
+grad_norm = 2
+
+[data]
+dataset_name = "roneneldan/TinyStories"
+
+[optim]
+type = "adam"
+lr = "1e-3"
+
+[runtime]
+num_microbatches = 1
+pipeline_schedule = "gpipe"
+activation_checkpointing = false
+dp_size = 1
+pp_size = 1
+ep_size = 1
+
+[profiler]
+enabled = false
+wait_steps = 2
+warmup_steps = 2
+active_steps = 2
+record_shapes = true
+profile_memory = true
+with_stack = false
+with_flops = false
+
+[hardware]
+peak_flops_tflops_per_gpu = 312.0
