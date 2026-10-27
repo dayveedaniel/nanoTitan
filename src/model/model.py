@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+
 import einops
 import torch
 import torch.nn as nn
@@ -46,9 +47,7 @@ class PositionEmbed(nn.Module):
     @staticmethod
     def _build_sinusoidal_pos_embed(cfg: ModelConfig) -> torch.Tensor:
         indices = torch.arange(cfg.max_seq_len).unsqueeze(1)
-        div_term = torch.exp(
-            torch.arange(0, cfg.d_model, 2) * (-math.log(10000.0) / cfg.d_model)
-        )
+        div_term = torch.exp(torch.arange(0, cfg.d_model, 2) * (-math.log(10000.0) / cfg.d_model))
         pos_embed = torch.zeros(cfg.max_seq_len, cfg.d_model, dtype=cfg.dtype)
         pos_embed[:, 0::2] = torch.sin(indices * div_term)
         pos_embed[:, 1::2] = torch.cos(indices * div_term)
@@ -81,9 +80,7 @@ class Unembed(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.cfg = cfg
-        self.unembed = nn.Linear(
-            self.cfg.d_model, self.cfg.vocab_size, bias=False, dtype=cfg.dtype
-        )
+        self.unembed = nn.Linear(self.cfg.d_model, self.cfg.vocab_size, bias=False, dtype=cfg.dtype)
 
     def forward(self, x: torch.Tensor):
         return self.unembed(x)
@@ -137,18 +134,10 @@ class MultiHeadAttention(nn.Module):
     def __init__(self, cfg: ModelConfig):
         super().__init__()
         self.cfg = cfg
-        self.W_Q = nn.Parameter(
-            torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype)
-        )
-        self.W_K = nn.Parameter(
-            torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype)
-        )
-        self.W_V = nn.Parameter(
-            torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype)
-        )
-        self.W_O = nn.Parameter(
-            torch.empty(cfg.d_head * cfg.n_heads, cfg.d_model, dtype=cfg.dtype)
-        )
+        self.W_Q = nn.Parameter(torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype))
+        self.W_K = nn.Parameter(torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype))
+        self.W_V = nn.Parameter(torch.empty(cfg.d_model, cfg.d_head * cfg.n_heads, dtype=cfg.dtype))
+        self.W_O = nn.Parameter(torch.empty(cfg.d_head * cfg.n_heads, cfg.d_model, dtype=cfg.dtype))
 
         nn.init.xavier_uniform_(self.W_Q)
         nn.init.xavier_uniform_(self.W_K)
@@ -156,9 +145,9 @@ class MultiHeadAttention(nn.Module):
         nn.init.xavier_uniform_(self.W_O)
 
         # Register mask. This implementation assumes that all residual streams have the same sequence length
-        mask = torch.tril(
-            torch.ones(self.cfg.max_seq_len, self.cfg.max_seq_len, dtype=torch.bool)
-        )[None, None, :, :]
+        mask = torch.tril(torch.ones(self.cfg.max_seq_len, self.cfg.max_seq_len, dtype=torch.bool))[
+            None, None, :, :
+        ]
         self.register_buffer("mask", mask)
 
     def forward(
@@ -214,9 +203,7 @@ class MultiHeadAttention(nn.Module):
             attn_out, "batch seq_Q n_heads d_head -> batch seq_Q (n_heads d_head)"
         )
 
-        out = einops.einsum(
-            attn_out, self.W_O, "batch seq d_in, d_in d_model -> batch seq d_model"
-        )
+        out = einops.einsum(attn_out, self.W_O, "batch seq d_in, d_in d_model -> batch seq d_model")
         return out
 
 
